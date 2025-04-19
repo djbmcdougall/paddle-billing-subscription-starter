@@ -13,6 +13,13 @@ import { FlagContentDialog } from "./flag-content-dialog"
 import { Toaster } from "./ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
 
+// Import the new dialog components
+import CommentDialog from "./comment-dialog"
+import ShareDialog from "./share-dialog"
+
+// Import the Avatar component at the top
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 interface RecommendationCardProps {
   recommendation: {
     id: string
@@ -46,6 +53,10 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
   const [isLiked, setIsLiked] = useState(false)
   const [isHearted, setIsHearted] = useState(false)
   const [imageError, setImageError] = useState(false)
+
+  // Add these state variables inside the RecommendationCard component, after the existing useState declarations
+  const [commentDialogOpen, setCommentDialogOpen] = useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
 
   // Add loading states for reactions
   const [isLikeLoading, setIsLikeLoading] = useState(false)
@@ -144,19 +155,18 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
           {/* User info and category */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="h-12 w-12 rounded-full bg-muted overflow-hidden relative">
-                <Image
+              {/* Replace the user avatar div with this Avatar component */}
+              <Avatar className="h-12 w-12">
+                <AvatarImage
                   src={recommendation.user.avatar || "/placeholder.svg?height=48&width=48&text=User"}
                   alt={recommendation.user.name}
-                  width={48}
-                  height={48}
-                  className="object-cover"
                   onError={(e) => {
                     // Fallback for avatar errors
                     e.currentTarget.src = `/placeholder.svg?height=48&width=48&text=${recommendation.user.name.charAt(0)}`
                   }}
                 />
-              </div>
+                <AvatarFallback>{recommendation.user.name.charAt(0)}</AvatarFallback>
+              </Avatar>
               <span className="font-medium text-lg">{recommendation.user.name}</span>
             </div>
             <div
@@ -253,6 +263,7 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
               variant="ghost"
               size="icon"
               className="h-8 w-8 hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              onClick={() => setCommentDialogOpen(true)}
               aria-label="Comment on this murmur"
             >
               <MessageCircle className="h-5 w-5 text-muted-foreground" />
@@ -261,6 +272,7 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
               variant="ghost"
               size="icon"
               className="h-8 w-8 hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              onClick={() => setShareDialogOpen(true)}
               aria-label="Share this murmur"
             >
               <Share2 className="h-5 w-5 text-muted-foreground" />
@@ -291,6 +303,21 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
           }
         }}
         contentId={recommendation.id}
+      />
+
+      <CommentDialog
+        open={commentDialogOpen}
+        onOpenChange={setCommentDialogOpen}
+        murmurId={recommendation.id}
+        murmurText={recommendation.text}
+        murmurUser={recommendation.user}
+      />
+
+      <ShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        murmurId={recommendation.id}
+        murmurText={recommendation.text}
       />
 
       <Toaster />

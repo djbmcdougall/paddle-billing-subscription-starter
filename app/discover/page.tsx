@@ -11,7 +11,6 @@ import Image from "next/image"
 import RecommendationCard from "@/components/recommendation-card"
 import CategoryIcon from "@/components/category-icon"
 import AddCategoryDialog from "@/components/add-category-dialog"
-import CreateMurmurButton from "@/components/create-murmur-button"
 
 export default function DiscoverPage() {
   const [categories, setCategories] = useState([
@@ -212,7 +211,6 @@ export default function DiscoverPage() {
           </TabsContent>
         </Tabs>
       </div>
-      <CreateMurmurButton />
     </div>
   )
 }

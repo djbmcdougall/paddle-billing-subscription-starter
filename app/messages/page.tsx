@@ -10,7 +10,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Search, Send, ArrowLeft } from "lucide-react"
 import Header from "@/components/header"
 import ProtectedRoute from "@/components/protected-route"
-import CreateMurmurButton from "@/components/create-murmur-button"
 
 type Message = {
   id: string
@@ -361,7 +360,6 @@ export default function MessagesPage() {
             </div>
           )}
         </div>
-        <CreateMurmurButton />
       </div>
     </ProtectedRoute>
   )

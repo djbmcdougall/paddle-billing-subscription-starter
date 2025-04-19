@@ -5,10 +5,12 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { MapPin, Settings, Users } from "lucide-react"
+import { Search, Settings, Users, Mail, Bell } from "lucide-react"
+import ProfileActionMenu from "@/components/profile-action-menu"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { MapPin } from "lucide-react"
 import RecommendationCard from "@/components/recommendation-card"
 import { useAuth } from "@/contexts/auth-context"
-import CreateMurmurButton from "@/components/create-murmur-button"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -17,6 +19,7 @@ export default function ProfilePage() {
 
   // Mock data for user profile
   const profile = {
+    id: user?.id || "1",
     name: user?.name || "Alex Morgan",
     avatar: user?.avatar || "/placeholder.svg?height=120&width=120&text=AM",
     bio: "Food enthusiast | Travel lover | Always looking for the next great experience",
@@ -156,10 +159,49 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <Button className="mt-4 flex items-center bg-purple-600 hover:bg-purple-700 text-white">
-            <Users className="mr-2 h-4 w-4" />
-            Listen
-          </Button>
+          <div className="mt-6 flex w-full justify-center">
+            <TooltipProvider>
+              <div className="flex items-center space-x-4">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" className="rounded-full h-12 w-12 bg-white">
+                      <Search className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Search</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" className="rounded-full h-12 w-12 bg-white">
+                      <Mail className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Message</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" className="rounded-full h-12 w-12 bg-white">
+                      <Bell className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Notifications</TooltipContent>
+                </Tooltip>
+
+                <ProfileActionMenu
+                  userId={profile.id || "1"}
+                  userName={profile.name}
+                  isOwnProfile={profile.name === user?.name}
+                />
+
+                <Button className="flex items-center bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full">
+                  <Users className="mr-2 h-5 w-5" />
+                  Listen
+                </Button>
+              </div>
+            </TooltipProvider>
+          </div>
         </div>
 
         <Tabs defaultValue="murmurs" className="mb-6">
@@ -181,7 +223,6 @@ export default function ProfilePage() {
           </TabsContent>
         </Tabs>
       </div>
-      <CreateMurmurButton />
     </div>
   )
 }

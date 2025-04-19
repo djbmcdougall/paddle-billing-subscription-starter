@@ -15,7 +15,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
-import CreateMurmurButton from "@/components/create-murmur-button"
 
 export default function SettingsPage() {
   const { user, logout, updateUser, updateUserPreferences } = useAuth()
@@ -757,7 +756,6 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
-      <CreateMurmurButton />
     </div>
   )
 }
