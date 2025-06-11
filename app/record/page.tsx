@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Mic, MicOff, Pause, Play, ImageIcon, MapPin, LinkIcon, Loader2, Languages } from "lucide-react"
+import { ImageIcon, MapPin, LinkIcon, Loader2, Languages } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import VoiceRecordingButton from "@/components/voice-recording-button"
 
 export default function RecordPage() {
   const [isRecording, setIsRecording] = useState(false)
@@ -190,43 +191,25 @@ export default function RecordPage() {
       <Card className="mb-6">
         <CardContent className="p-6">
           <div className="mb-6 flex flex-col items-center justify-center">
-            <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-secondary/10 relative">
-              {isRecording && (
-                <div className="absolute inset-0 rounded-full overflow-hidden">
-                  <div
-                    className="absolute bottom-0 bg-secondary/30 w-full transition-all duration-300"
-                    style={{ height: `${recordingProgress}%` }}
-                  />
-                </div>
-              )}
-              {isRecording ? (
-                <div className="relative z-10">
-                  <div className="absolute inset-0 animate-ping rounded-full bg-secondary/20"></div>
-                  {isPaused ? (
-                    <MicOff className="h-12 w-12 text-secondary" />
-                  ) : (
-                    <Mic className="h-12 w-12 text-secondary" />
-                  )}
-                </div>
-              ) : (
-                <Mic className="h-12 w-12 text-muted-foreground" />
-              )}
-            </div>
-
-            <div className="mb-2 text-2xl font-mono">{formatTime(recordingTime)}</div>
-
-            <div className="flex space-x-2">
-              <Button variant={isRecording ? "outline" : "secondary"} onClick={toggleRecording}>
-                {isRecording ? "Stop" : "Start Recording"}
-              </Button>
-
-              {isRecording && (
-                <Button variant="outline" onClick={togglePause}>
-                  {isPaused ? <Play className="mr-2 h-4 w-4" /> : <Pause className="mr-2 h-4 w-4" />}
-                  {isPaused ? "Resume" : "Pause"}
-                </Button>
-              )}
-            </div>
+            <VoiceRecordingButton
+              onRecordingStart={() => {
+                setRecordingTime(0)
+                setRecordingProgress(0)
+              }}
+              onRecordingStop={(audioBlob) => {
+                // Handle the recorded audio blob
+                console.log("Recording completed:", audioBlob)
+                handleTranscribe()
+              }}
+              onRecordingError={(error) => {
+                toast({
+                  title: "Recording failed",
+                  description: error,
+                  variant: "destructive",
+                })
+              }}
+              maxDuration={30}
+            />
           </div>
 
           <Tabs defaultValue="transcription" className="mt-6">

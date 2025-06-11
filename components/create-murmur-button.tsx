@@ -31,11 +31,11 @@ export default function CreateMurmurButton() {
     <Button
       onClick={handleClick}
       size="lg"
-      className="fixed bottom-20 right-4 md:right-8 rounded-full shadow-lg h-14 w-14 md:h-16 md:w-16 p-0 bg-accent hover:bg-accent/90 z-40"
+      className="fixed bottom-20 right-4 md:right-8 rounded-full shadow-lg h-16 w-16 md:h-18 md:w-18 p-0 bg-primary hover:bg-primary/90 z-40 animate-pulse"
       disabled={isLoading}
     >
-      {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Mic className="h-6 w-6" />}
-      <span className="sr-only">Create new murmur</span>
+      {isLoading ? <Loader2 className="h-8 w-8 animate-spin" /> : <Mic className="h-8 w-8" />}
+      <span className="sr-only">Record voice review</span>
     </Button>
   )
 }

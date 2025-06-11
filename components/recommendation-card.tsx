@@ -4,20 +4,33 @@ import type React from "react"
 
 import Image from "next/image"
 import { useState } from "react"
-import { ThumbsUp, Heart, Share2, MessageCircle, Flag, ChevronDown, ChevronUp, Loader2 } from "lucide-react"
+import {
+  ThumbsUp,
+  Heart,
+  Share2,
+  MessageCircle,
+  Flag,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  Mic,
+  CheckCircle,
+} from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import AudioPlayer from "./audio-player"
+import AudioWaveform from "./audio-waveform"
+import PlayButton from "./play-button"
 import { FlagContentDialog } from "./flag-content-dialog"
 import { Toaster } from "./ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
+import { Badge } from "@/components/ui/badge"
 
-// Import the new dialog components
+// Import the dialog components
 import CommentDialog from "./comment-dialog"
 import ShareDialog from "./share-dialog"
 
-// Import the Avatar component at the top
+// Import the Avatar component
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface RecommendationCardProps {
@@ -26,6 +39,7 @@ interface RecommendationCardProps {
     user: {
       name: string
       avatar: string
+      trustLevel?: "bronze" | "silver" | "gold" | "platinum"
     }
     text: string
     location: string | null
@@ -35,6 +49,7 @@ interface RecommendationCardProps {
     }
     category: string
     sentiment: string
+    emotion?: "enthusiastic" | "satisfied" | "neutral" | "disappointed" | "angry"
     image: string | null
     audio?: string
     reactions: {
@@ -43,6 +58,7 @@ interface RecommendationCardProps {
       heart?: number
     }
     verified: boolean
+    verificationTypes?: Array<"voice" | "purchase" | "visit" | "photo">
   }
 }
 
@@ -53,8 +69,9 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
   const [isLiked, setIsLiked] = useState(false)
   const [isHearted, setIsHearted] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
 
-  // Add these state variables inside the RecommendationCard component, after the existing useState declarations
+  // Add these state variables
   const [commentDialogOpen, setCommentDialogOpen] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
 
@@ -132,9 +149,58 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
     }
   }
 
+  // Get sentiment color
+  const getSentimentColor = () => {
+    switch (recommendation.sentiment) {
+      case "Positive":
+        return "bg-success/10 border-success text-success-foreground"
+      case "Negative":
+        return "bg-destructive/10 border-destructive text-destructive-foreground"
+      default:
+        return "bg-secondary/10 border-secondary text-secondary-foreground"
+    }
+  }
+
+  // Get emotion label and icon
+  const getEmotionLabel = () => {
+    switch (recommendation.emotion) {
+      case "enthusiastic":
+        return { label: "Enthusiastic", icon: "🎉" }
+      case "satisfied":
+        return { label: "Satisfied", icon: "😊" }
+      case "neutral":
+        return { label: "Neutral", icon: "😐" }
+      case "disappointed":
+        return { label: "Disappointed", icon: "😕" }
+      case "angry":
+        return { label: "Angry", icon: "😠" }
+      default:
+        return null
+    }
+  }
+
+  // Get trust level badge
+  const getTrustLevelBadge = () => {
+    switch (recommendation.user.trustLevel) {
+      case "bronze":
+        return { label: "Bronze", icon: "🥉", color: "bg-amber-700/20 text-amber-700" }
+      case "silver":
+        return { label: "Silver", icon: "🥈", color: "bg-gray-400/20 text-gray-600" }
+      case "gold":
+        return { label: "Gold", icon: "🥇", color: "bg-yellow-400/20 text-yellow-700" }
+      case "platinum":
+        return { label: "Platinum", icon: "💎", color: "bg-cyan-400/20 text-cyan-700" }
+      default:
+        return null
+    }
+  }
+
+  const emotion = getEmotionLabel()
+  const trustLevel = getTrustLevelBadge()
+
   return (
     <>
-      <Card className="overflow-hidden bg-card shadow-blue-sm border-muted">
+      <Card className={cn("overflow-hidden bg-card shadow-blue-sm border-muted", getSentimentColor())}>
         {recommendation.image && !imageError ? (
           <div className="relative h-48 w-full bg-muted">
             <Image
@@ -152,41 +218,116 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
         ) : null}
 
         <CardContent className="p-4">
-          {/* User info and category */}
+          {/* User info and verification badges */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              {/* Replace the user avatar div with this Avatar component */}
-              <Avatar className="h-12 w-12">
-                <AvatarImage
-                  src={recommendation.user.avatar || "/placeholder.svg?height=48&width=48&text=User"}
-                  alt={recommendation.user.name}
-                  onError={(e) => {
-                    // Fallback for avatar errors
-                    e.currentTarget.src = `/placeholder.svg?height=48&width=48&text=${recommendation.user.name.charAt(0)}`
-                  }}
-                />
-                <AvatarFallback>{recommendation.user.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <span className="font-medium text-lg">{recommendation.user.name}</span>
+              <div className="relative">
+                <Avatar className="h-12 w-12 border-2 border-background">
+                  <AvatarImage
+                    src={recommendation.user.avatar || "/placeholder.svg?height=48&width=48&text=User"}
+                    alt={recommendation.user.name}
+                    onError={(e) => {
+                      // Fallback for avatar errors
+                      e.currentTarget.src = `/placeholder.svg?height=48&width=48&text=${recommendation.user.name.charAt(0)}`
+                    }}
+                  />
+                  <AvatarFallback>{recommendation.user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                {trustLevel && (
+                  <div className="absolute -bottom-1 -right-1 rounded-full bg-background p-0.5">
+                    <span className="text-xs">{trustLevel.icon}</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center">
+                  <span className="font-medium text-lg">{recommendation.user.name}</span>
+                  {recommendation.verified && <CheckCircle className="ml-1 h-4 w-4 text-primary" />}
+                </div>
+                {trustLevel && (
+                  <Badge variant="outline" className={cn("text-xs", trustLevel.color)}>
+                    Trust Level: {trustLevel.label}
+                  </Badge>
+                )}
+              </div>
             </div>
             <div
               className={cn(
                 "px-4 py-2 rounded-full text-sm font-medium",
                 recommendation.sentiment === "Positive"
-                  ? "bg-success text-success-foreground"
+                  ? "bg-success/20 text-success-foreground"
                   : recommendation.sentiment === "Negative"
-                    ? "bg-destructive text-destructive-foreground"
-                    : "bg-secondary text-secondary-foreground",
+                    ? "bg-destructive/20 text-destructive-foreground"
+                    : "bg-secondary/20 text-secondary-foreground",
               )}
             >
               {recommendation.category}
             </div>
           </div>
 
-          {/* Audio player */}
-          <div className="mb-4 p-3 rounded-md bg-muted/50">
-            <AudioPlayer audioUrl={audioUrl} />
+          {/* Verification badges */}
+          {recommendation.verificationTypes && recommendation.verificationTypes.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {recommendation.verificationTypes.includes("voice") && (
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                  <Mic className="mr-1 h-3 w-3" /> Voice Verified
+                </Badge>
+              )}
+              {recommendation.verificationTypes.includes("purchase") && (
+                <Badge variant="outline" className="bg-success/10 text-success border-success/30">
+                  <CheckCircle className="mr-1 h-3 w-3" /> Purchase Confirmed
+                </Badge>
+              )}
+              {recommendation.verificationTypes.includes("visit") && (
+                <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/30">
+                  <CheckCircle className="mr-1 h-3 w-3" /> Visit Verified
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {/* Audio player with enhanced waveform */}
+          <div className="mb-4 p-3 rounded-md bg-background/80 shadow-sm">
+            <div className="flex items-center gap-3">
+              <PlayButton
+                onToggle={(playing) => setIsPlaying(playing)}
+                size="md"
+                className="bg-primary border-primary text-white"
+              />
+              <div className="flex-1">
+                <AudioWaveform
+                  audioUrl={audioUrl}
+                  isPlaying={isPlaying}
+                  height={50}
+                  barColor={
+                    recommendation.sentiment === "Positive"
+                      ? "#B8E1DD"
+                      : recommendation.sentiment === "Negative"
+                        ? "#F3BDB5"
+                        : "#DADBE9"
+                  }
+                  progressColor={
+                    recommendation.sentiment === "Positive"
+                      ? "#7B91C9"
+                      : recommendation.sentiment === "Negative"
+                        ? "#F3BDB5"
+                        : "#7B91C9"
+                  }
+                  useGradient={true}
+                  showRealTimeVisualization={true}
+                />
+              </div>
+            </div>
           </div>
+
+          {/* Emotion tag */}
+          {emotion && (
+            <div className="mb-3">
+              <Badge variant="outline" className="bg-muted/50">
+                <span className="mr-1">{emotion.icon}</span> {emotion.label} Tone
+              </Badge>
+            </div>
+          )}
 
           {/* Content text */}
           <div className="mb-2">
