@@ -13,14 +13,14 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 
 export default function HomePage() {
-  // Mock data for recommendations with real faces, images, coordinates
+  // Mock data for recommendations with Sarah's multiple images
   const recommendations = [
     {
       id: "1",
       user: {
         name: "Sarah Johnson",
-        avatar: "/placeholder.svg?height=40&width=40&text=SJ",
-        trustLevel: "gold",
+        avatar: "/users/sarah-johnson.jpg",
+        trustScore: 87,
       },
       text: "I absolutely loved the coffee at Brew & Bean! The atmosphere was cozy and the staff was super friendly. Definitely recommend their caramel latte! The pastries were also fresh and delicious. I spent a few hours working there and the WiFi was fast and reliable. The prices are reasonable for the quality you get. I'll definitely be coming back regularly.",
       location: "Brew & Bean Coffee Shop",
@@ -30,22 +30,27 @@ export default function HomePage() {
       },
       category: "Food & Drink",
       sentiment: "Positive",
-      emotion: "enthusiastic",
-      image: "/placeholder.svg?height=300&width=400&text=Coffee+Shop",
+      emotion: "enthusiastic" as const,
+      images: ["/recommendations/sarah-coffee-1.jpg", "/recommendations/sarah-coffee-2.jpg"],
       audio: "/placeholder.mp3",
       reactions: {
         thumbsUp: 24,
         heart: 12,
       },
       verified: true,
-      verificationTypes: ["voice", "purchase", "visit"],
+      verificationTypes: ["voice", "purchase", "visit"] as const,
+      actionButton: {
+        type: "reservation" as const,
+        label: "Reservation",
+        url: "https://example.com/reservation",
+      },
     },
     {
       id: "2",
       user: {
         name: "Mike Chen",
-        avatar: "/placeholder.svg?height=40&width=40&text=MC",
-        trustLevel: "silver",
+        avatar: "/users/mike-chen.jpg",
+        trustScore: 73,
       },
       text: "The new hiking trail at Evergreen Park is absolutely stunning! Great views and well-maintained paths. Perfect for a weekend adventure. I went there last Saturday and was amazed by the natural beauty. The trail is about 5 miles long with moderate difficulty, so it's suitable for most hikers. There are several lookout points along the way with breathtaking views of the valley and mountains beyond. I'd recommend going early in the morning to avoid crowds and catch the beautiful morning light.",
       location: "Evergreen Park",
@@ -55,42 +60,56 @@ export default function HomePage() {
       },
       category: "Outdoors",
       sentiment: "Positive",
-      emotion: "satisfied",
-      image: "/placeholder.svg?height=300&width=400&text=Hiking+Trail",
+      emotion: "satisfied" as const,
+      image: "/recommendations/hiking-trail.jpg",
       audio: "/placeholder.mp3",
       reactions: {
         thumbsUp: 18,
         heart: 9,
       },
       verified: true,
-      verificationTypes: ["voice", "visit"],
+      verificationTypes: ["voice", "visit"] as const,
+      actionButton: {
+        type: "directions" as const,
+        label: "Directions",
+        coordinates: {
+          latitude: 37.7694,
+          longitude: -122.4862,
+        },
+      },
     },
     {
       id: "3",
       user: {
         name: "Emily Rodriguez",
-        avatar: "/placeholder.svg?height=40&width=40&text=ER",
-        trustLevel: "bronze",
+        avatar: "/users/emily-rodriguez.jpg",
+        trustScore: 92,
       },
       text: 'Just finished reading "The Midnight Library" and it was such a thought-provoking book. The character development was incredible! The story follows Nora Seed who finds herself in a library between life and death, with each book representing a different version of her life. It really makes you think about the choices we make and the ripple effects they have. The author does an amazing job of weaving philosophy into an engaging narrative. Highly recommend for anyone looking for a meaningful read.',
       location: null,
       category: "Books",
       sentiment: "Positive",
-      emotion: "enthusiastic",
-      image: "/placeholder.svg?height=300&width=400&text=Book+Cover",
+      emotion: "enthusiastic" as const,
+      image: "/recommendations/midnight-library-book.jpg",
       audio: "/placeholder.mp3",
       reactions: {
         thumbsUp: 32,
         heart: 15,
       },
       verified: false,
-      verificationTypes: ["voice"],
+      verificationTypes: ["voice"] as const,
+      actionButton: {
+        type: "purchase" as const,
+        label: "Purchase",
+        url: "https://example.com/book-purchase",
+      },
     },
     {
       id: "4",
       user: {
         name: "David Kim",
-        avatar: "/placeholder.svg?height=40&width=40&text=DK",
+        avatar: "/users/david-kim.jpg",
+        trustScore: 45,
       },
       text: "The service at Tech Gadgets was disappointing. Waited for 30 minutes and the staff wasn't knowledgeable about the products. When I finally got help, the employee couldn't answer basic questions about the laptop specs and kept checking their phone. The store was also disorganized with items in the wrong places. I ended up leaving without making a purchase and found a much better experience at another store. Would not recommend if you're looking for informed tech advice.",
       location: "Tech Gadgets Store",
@@ -100,15 +119,23 @@ export default function HomePage() {
       },
       category: "Shopping",
       sentiment: "Negative",
-      emotion: "disappointed",
-      image: "/placeholder.svg?height=300&width=400&text=Electronics+Store",
+      emotion: "disappointed" as const,
+      image: "/recommendations/tech-gadgets-store.jpg",
       audio: "/placeholder.mp3",
       reactions: {
         thumbsDown: 8,
         thumbsUp: 2,
       },
       verified: true,
-      verificationTypes: ["voice", "visit"],
+      verificationTypes: ["voice", "visit"] as const,
+      actionButton: {
+        type: "directions" as const,
+        label: "Directions",
+        coordinates: {
+          latitude: 37.7831,
+          longitude: -122.4039,
+        },
+      },
     },
   ]
 

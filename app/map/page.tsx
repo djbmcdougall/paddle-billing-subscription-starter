@@ -19,15 +19,16 @@ export default function MapPage() {
   const mapRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
 
-  // Mock data for geotagged murmurs
+  // Mock data for geotagged murmurs with real images
   const murmurs = [
     {
       id: "1",
       user: {
         name: "Sarah Johnson",
-        avatar: "/placeholder.svg?height=40&width=40&text=SJ",
+        avatar: "/users/sarah-johnson.jpg",
+        trustScore: 87,
       },
-      text: "I absolutely loved the coffee at Brew & Bean! The atmosphere was cozy and the staff was super friendly.",
+      text: "I absolutely loved the coffee at Brew & Bean! The atmosphere was cozy and the staff was super friendly. The barista recommended their signature blend and it was incredible.",
       location: "Brew & Bean Coffee Shop",
       coordinates: {
         latitude: 37.7749,
@@ -35,21 +36,28 @@ export default function MapPage() {
       },
       category: "Food & Drink",
       sentiment: "Positive",
-      image: "/placeholder.svg?height=300&width=400&text=Coffee+Shop",
+      images: ["/recommendations/sarah-coffee-1.jpg", "/recommendations/sarah-coffee-2.jpg"],
       audio: "/placeholder.mp3",
       reactions: {
         thumbsUp: 24,
         heart: 12,
       },
       verified: true,
+      verificationTypes: ["voice", "visit"],
+      actionButton: {
+        type: "reservation",
+        label: "Reservation",
+        url: "https://example.com/reserve",
+      },
     },
     {
       id: "2",
       user: {
         name: "Mike Chen",
-        avatar: "/placeholder.svg?height=40&width=40&text=MC",
+        avatar: "/users/mike-chen.jpg",
+        trustScore: 73,
       },
-      text: "The new hiking trail at Evergreen Park is absolutely stunning! Great views and well-maintained paths.",
+      text: "The new hiking trail at Evergreen Park is absolutely stunning! Great views and well-maintained paths. Perfect for a morning workout or peaceful evening walk.",
       location: "Evergreen Park",
       coordinates: {
         latitude: 37.7694,
@@ -57,21 +65,31 @@ export default function MapPage() {
       },
       category: "Outdoors",
       sentiment: "Positive",
-      image: "/placeholder.svg?height=300&width=400&text=Hiking+Trail",
+      image: "/recommendations/hiking-trail.jpg",
       audio: "/placeholder.mp3",
       reactions: {
         thumbsUp: 18,
         heart: 9,
       },
       verified: true,
+      verificationTypes: ["voice", "visit"],
+      actionButton: {
+        type: "directions",
+        label: "Directions",
+        coordinates: {
+          latitude: 37.7694,
+          longitude: -122.4862,
+        },
+      },
     },
     {
       id: "3",
       user: {
         name: "David Kim",
-        avatar: "/placeholder.svg?height=40&width=40&text=DK",
+        avatar: "/users/david-kim.jpg",
+        trustScore: 45,
       },
-      text: "The service at Tech Gadgets was disappointing. Waited for 30 minutes and the staff wasn't knowledgeable.",
+      text: "The service at Tech Gadgets was disappointing. Waited for 30 minutes and the staff wasn't knowledgeable about their products. Would not recommend.",
       location: "Tech Gadgets Store",
       coordinates: {
         latitude: 37.7831,
@@ -79,13 +97,54 @@ export default function MapPage() {
       },
       category: "Shopping",
       sentiment: "Negative",
-      image: "/placeholder.svg?height=300&width=400&text=Electronics+Store",
+      image: "/recommendations/tech-gadgets-store.jpg",
       audio: "/placeholder.mp3",
       reactions: {
         thumbsDown: 8,
         thumbsUp: 2,
       },
       verified: true,
+      verificationTypes: ["voice", "purchase"],
+      actionButton: {
+        type: "directions",
+        label: "Directions",
+        coordinates: {
+          latitude: 37.7831,
+          longitude: -122.4039,
+        },
+      },
+    },
+    {
+      id: "4",
+      user: {
+        name: "Emily Rodriguez",
+        avatar: "/users/emily-rodriguez.jpg",
+        trustScore: 92,
+      },
+      text: "Amazing bookstore with a great selection of local authors! The staff gave excellent recommendations and they have a cozy reading corner with great coffee.",
+      location: "Pages & Prose Bookstore",
+      coordinates: {
+        latitude: 37.7849,
+        longitude: -122.4094,
+      },
+      category: "Shopping",
+      sentiment: "Positive",
+      image: "/recommendations/bookstore.jpg",
+      audio: "/placeholder.mp3",
+      reactions: {
+        thumbsUp: 31,
+        heart: 15,
+      },
+      verified: true,
+      verificationTypes: ["voice", "purchase", "visit"],
+      actionButton: {
+        type: "directions",
+        label: "Directions",
+        coordinates: {
+          latitude: 37.7849,
+          longitude: -122.4094,
+        },
+      },
     },
   ]
 
@@ -154,28 +213,44 @@ export default function MapPage() {
             ) : (
               <div
                 ref={mapRef}
-                className="w-full h-full bg-muted"
+                className="w-full h-full bg-muted relative"
                 style={{
-                  backgroundImage: `url(/placeholder.svg?height=600&width=800&text=Map+View)`,
+                  backgroundImage: `url(/maps/san-francisco-3d-map.webp)`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
               >
-                {/* Map pins would be rendered here */}
-                {murmurs.map((murmur) => (
+                {/* Map controls (Google Maps style) */}
+                <div className="absolute top-4 right-4 flex flex-col space-y-2">
+                  <div className="bg-white rounded shadow-md p-1">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <span className="text-lg font-bold">+</span>
+                    </Button>
+                  </div>
+                  <div className="bg-white rounded shadow-md p-1">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <span className="text-lg font-bold">−</span>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Custom Murmur pins overlaid on the existing map pins */}
+                {murmurs.map((murmur, index) => (
                   <div
                     key={murmur.id}
-                    className="absolute cursor-pointer"
+                    className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2"
                     style={{
-                      left: `${Math.random() * 80 + 10}%`,
-                      top: `${Math.random() * 80 + 10}%`,
+                      left: `${30 + index * 15}%`,
+                      top: `${40 + index * 10}%`,
                     }}
                     onClick={() => setSelectedMurmur(murmur)}
                   >
                     <div
-                      className={`p-1 rounded-full ${murmur.sentiment === "Positive" ? "bg-success" : "bg-destructive"}`}
+                      className={`p-2 rounded-full shadow-lg border-2 border-white ${
+                        murmur.sentiment === "Positive" ? "bg-green-500" : "bg-red-500"
+                      } hover:scale-110 transition-transform`}
                     >
-                      <MapPin className="h-6 w-6 text-white" />
+                      <MapPin className="h-4 w-4 text-white" />
                     </div>
                   </div>
                 ))}
@@ -206,16 +281,50 @@ export default function MapPage() {
                       <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
                       <span className="font-medium">{murmur.location}</span>
                     </div>
-                    <p className="text-sm line-clamp-2">{murmur.text}</p>
-                    <div className="flex items-center mt-2">
-                      <div className="h-6 w-6 rounded-full bg-muted overflow-hidden relative mr-2">
-                        <img
-                          src={murmur.user.avatar || "/placeholder.svg"}
-                          alt={murmur.user.name}
-                          className="object-cover"
-                        />
+                    <p className="text-sm line-clamp-2 mb-2">{murmur.text}</p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="h-6 w-6 rounded-full bg-muted overflow-hidden relative mr-2">
+                          <img
+                            src={murmur.user.avatar || "/placeholder.svg"}
+                            alt={murmur.user.name}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-xs text-muted-foreground">{murmur.user.name}</span>
+                          {murmur.user.trustScore && (
+                            <div
+                              className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${
+                                murmur.user.trustScore >= 80
+                                  ? "bg-green-500"
+                                  : murmur.user.trustScore >= 60
+                                    ? "bg-blue-500"
+                                    : murmur.user.trustScore >= 40
+                                      ? "bg-yellow-500"
+                                      : "bg-red-500"
+                              }`}
+                            >
+                              {murmur.user.trustScore}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <span className="text-xs text-muted-foreground">{murmur.user.name}</span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          // Play audio functionality would go here
+                          toast({
+                            title: "Playing audio",
+                            description: `Playing ${murmur.user.name}'s recommendation`,
+                          })
+                        }}
+                      >
+                        Play
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

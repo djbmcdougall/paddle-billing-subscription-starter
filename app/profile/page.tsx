@@ -5,23 +5,25 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Search, Settings, Users, Mail, Bell } from "lucide-react"
+import { Search, Settings, Users, Mail, Bell, Bookmark } from "lucide-react"
 import ProfileActionMenu from "@/components/profile-action-menu"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { MapPin } from "lucide-react"
 import RecommendationCard from "@/components/recommendation-card"
 import { useAuth } from "@/contexts/auth-context"
+import { useSavedMurmurs } from "@/contexts/saved-murmurs-context"
 
 export default function ProfilePage() {
   const router = useRouter()
   const { user } = useAuth()
+  const { savedMurmurs } = useSavedMurmurs()
   const [avatarError, setAvatarError] = useState(false)
 
   // Mock data for user profile
   const profile = {
     id: user?.id || "1",
     name: user?.name || "Alex Morgan",
-    avatar: user?.avatar || "/placeholder.svg?height=120&width=120&text=AM",
+    avatar: user?.avatar || "/users/alex-morgan.jpg",
     bio: "Food enthusiast | Travel lover | Always looking for the next great experience",
     location: "San Francisco, CA",
     countryFlag: user?.countryFlag || "🇺🇸",
@@ -79,6 +81,50 @@ export default function ProfilePage() {
         heart: 9,
       },
       verified: true,
+    },
+  ]
+
+  // Mock data for users Alex is listening to
+  const listeningUsers = [
+    {
+      id: "sarah-1",
+      name: "Sarah Johnson",
+      avatar: "/users/sarah-johnson.jpg",
+      bio: "Coffee enthusiast & local foodie",
+      location: "San Francisco, CA",
+      murmurCount: 23,
+      listenerCount: 145,
+      verified: true,
+    },
+    {
+      id: "mike-2",
+      name: "Mike Chen",
+      avatar: "/users/mike-chen.jpg",
+      bio: "Tech reviewer & gadget lover",
+      location: "Palo Alto, CA",
+      murmurCount: 18,
+      listenerCount: 89,
+      verified: false,
+    },
+    {
+      id: "emily-3",
+      name: "Emily Rodriguez",
+      avatar: "/users/emily-rodriguez.jpg",
+      bio: "Bookworm & literature enthusiast",
+      location: "Berkeley, CA",
+      murmurCount: 31,
+      listenerCount: 203,
+      verified: true,
+    },
+    {
+      id: "david-4",
+      name: "David Kim",
+      avatar: "/users/david-kim.jpg",
+      bio: "Outdoor adventurer & hiker",
+      location: "Oakland, CA",
+      murmurCount: 15,
+      listenerCount: 67,
+      verified: false,
     },
   ]
 
@@ -205,8 +251,9 @@ export default function ProfilePage() {
         </div>
 
         <Tabs defaultValue="murmurs" className="mb-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="murmurs">Murmurs</TabsTrigger>
+            <TabsTrigger value="saved">Saved</TabsTrigger>
             <TabsTrigger value="listening">Listening</TabsTrigger>
           </TabsList>
           <TabsContent value="murmurs" className="mt-6">
@@ -216,10 +263,71 @@ export default function ProfilePage() {
               ))}
             </div>
           </TabsContent>
+          <TabsContent value="saved" className="mt-6">
+            {savedMurmurs.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {recommendations
+                  .filter((rec) => savedMurmurs.includes(rec.id))
+                  .map((recommendation) => (
+                    <RecommendationCard key={recommendation.id} recommendation={recommendation} />
+                  ))}
+              </div>
+            ) : (
+              <Card className="flex h-40 items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <Bookmark className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
+                  <p>No saved murmurs yet.</p>
+                  <p className="text-sm">Save murmurs you want to revisit later!</p>
+                </div>
+              </Card>
+            )}
+          </TabsContent>
           <TabsContent value="listening" className="mt-6">
-            <Card className="flex h-40 items-center justify-center text-muted-foreground">
-              You haven't listened to anyone yet.
-            </Card>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {listeningUsers.map((user) => (
+                <Card key={user.id} className="p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="relative">
+                      <Image
+                        src={user.avatar || "/placeholder.svg"}
+                        alt={user.name}
+                        width={48}
+                        height={48}
+                        className="h-12 w-12 rounded-full object-cover"
+                      />
+                      {user.verified && (
+                        <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-blue-500 flex items-center justify-center">
+                          <svg className="h-2.5 w-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-sm truncate">{user.name}</h3>
+                        <Button variant="outline" size="sm" className="text-xs">
+                          Listening
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{user.bio}</p>
+                      <div className="flex items-center text-xs text-muted-foreground mt-2">
+                        <MapPin className="h-3 w-3 mr-1" />
+                        <span>{user.location}</span>
+                      </div>
+                      <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
+                        <span>{user.murmurCount} murmurs</span>
+                        <span>{user.listenerCount} listeners</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           </TabsContent>
         </Tabs>
       </div>

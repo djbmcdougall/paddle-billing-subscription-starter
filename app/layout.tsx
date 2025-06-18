@@ -5,13 +5,14 @@ import { AuthProvider } from "@/contexts/auth-context"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 import Navigation from "@/components/navigation"
+import { SavedMurmursProvider } from "@/contexts/saved-murmurs-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "Murmur - Voice-First Recommendations",
   description: "Discover and share trusted recommendations through voice",
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -24,11 +25,13 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-screen bg-background`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <AuthProvider>
-            <div className="flex min-h-screen flex-col">
-              <main className="flex-1">{children}</main>
-              <Navigation />
-            </div>
-            <Toaster />
+            <SavedMurmursProvider>
+              <div className="flex min-h-screen flex-col">
+                <main className="flex-1">{children}</main>
+                <Navigation />
+              </div>
+              <Toaster />
+            </SavedMurmursProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

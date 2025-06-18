@@ -20,13 +20,14 @@ export default function DiscoverPage() {
     { id: "4", name: "Entertainment", type: "entertainment" as const },
   ])
 
-  // Mock data for trending recommendations
+  // Mock data for trending recommendations with real images
   const trendingRecommendations = [
     {
       id: "1",
       user: {
         name: "Sarah Johnson",
-        avatar: "/placeholder.svg?height=40&width=40&text=SJ",
+        avatar: "/users/sarah-johnson.jpg",
+        trustScore: 87,
       },
       text: "I absolutely loved the coffee at Brew & Bean! The atmosphere was cozy and the staff was super friendly. Definitely recommend their caramel latte! The pastries were also fresh and delicious. I spent a few hours working there and the WiFi was fast and reliable. The prices are reasonable for the quality you get. I'll definitely be coming back regularly.",
       location: "Brew & Bean Coffee Shop",
@@ -36,19 +37,26 @@ export default function DiscoverPage() {
       },
       category: "Food & Drink",
       sentiment: "Positive",
-      image: "/placeholder.svg?height=300&width=400&text=Coffee+Shop",
+      images: ["/recommendations/sarah-coffee-1.jpg", "/recommendations/sarah-coffee-2.jpg"],
       audio: "/placeholder.mp3",
       reactions: {
         thumbsUp: 24,
         heart: 12,
       },
       verified: true,
+      verificationTypes: ["voice", "purchase", "visit"],
+      actionButton: {
+        type: "reservation",
+        label: "Reservation",
+        url: "https://example.com/reservation",
+      },
     },
     {
       id: "2",
       user: {
         name: "Mike Chen",
-        avatar: "/placeholder.svg?height=40&width=40&text=MC",
+        avatar: "/users/mike-chen.jpg",
+        trustScore: 73,
       },
       text: "The new hiking trail at Evergreen Park is absolutely stunning! Great views and well-maintained paths. Perfect for a weekend adventure. I went there last Saturday and was amazed by the natural beauty. The trail is about 5 miles long with moderate difficulty, so it's suitable for most hikers. There are several lookout points along the way with breathtaking views of the valley and mountains beyond.",
       location: "Evergreen Park",
@@ -58,36 +66,45 @@ export default function DiscoverPage() {
       },
       category: "Outdoors",
       sentiment: "Positive",
-      image: "/placeholder.svg?height=300&width=400&text=Hiking+Trail",
+      image: "/recommendations/hiking-trail.jpg",
       audio: "/placeholder.mp3",
       reactions: {
         thumbsUp: 18,
         heart: 9,
       },
       verified: true,
+      verificationTypes: ["voice", "visit"],
+      actionButton: {
+        type: "directions",
+        label: "Directions",
+        coordinates: {
+          latitude: 37.7694,
+          longitude: -122.4862,
+        },
+      },
     },
   ]
 
-  // Mock data for suggested users
+  // Mock data for suggested users with real profile pictures
   const suggestedUsers = [
     {
       id: "1",
       name: "Jamie Oliver",
-      avatar: "/placeholder.svg?height=60&width=60&text=JO",
+      avatar: "/users/jamie-oliver.jpg",
       bio: "Food critic & restaurant reviewer",
       murmurs: 87,
     },
     {
       id: "2",
       name: "Lisa Travel",
-      avatar: "/placeholder.svg?height=60&width=60&text=LT",
+      avatar: "/users/lisa-travel.jpg",
       bio: "Travel blogger & adventure seeker",
       murmurs: 124,
     },
     {
       id: "3",
       name: "Tech Review Guy",
-      avatar: "/placeholder.svg?height=60&width=60&text=TR",
+      avatar: "/users/tech-review-guy.jpg",
       bio: "Honest tech product reviews",
       murmurs: 56,
     },
