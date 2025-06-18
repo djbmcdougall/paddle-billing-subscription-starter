@@ -11,7 +11,7 @@ export default function Header({ showSearch = true }) {
   return (
     <header className="sticky top-0 z-40 border-b border-muted bg-gradient-periwinkle shadow-periwinkle-sm">
       <div className="container flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center space-x-1">
+        <Link href="/" className="flex items-center space-x-2">
           <Image
             src="/images/murmur-logo.png"
             alt="Murmur Logo"
@@ -20,7 +20,7 @@ export default function Header({ showSearch = true }) {
             className="h-8 w-8 object-contain"
             priority
           />
-          <span className={`${quicksand.className} text-xl font-bold tracking-tight ml-0 text-black`}>murmur</span>
+          <span className={`${quicksand.className} text-xl font-bold tracking-tight text-black`}>murmur</span>
         </Link>
 
         {showSearch && (
@@ -33,13 +33,9 @@ export default function Header({ showSearch = true }) {
           <NotificationDropdown />
           <Link href="/profile">
             <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted/30">
-              <Image
-                src="/placeholder.svg?height=32&width=32&text=AM"
-                alt="User Avatar"
-                width={32}
-                height={32}
-                className="h-8 w-8 rounded-full"
-              />
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center text-white font-semibold text-sm">
+                AM
+              </div>
             </Button>
           </Link>
         </div>
